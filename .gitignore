@@ -1,0 +1,32 @@
+# secrets & PII — never commit
+*.key
+openrouter.key
+.env
+# run outputs (large, per-run, may contain payloads)
+out/
+out_*/
+**/out/
+**/out_*/
+live_runs*/
+cards/
+*.console
+*.log
+# build / cache / os
+__pycache__/
+*.pyc
+.DS_Store
+# archives / rendered images
+*.zip
+*.png
+*.jpg
+runs/
+# urlquery field data: raw pages carry throwaway credentials from the payloads — never commit
+evidence/urlquery/raw/
+evidence/urlquery/targets.csv
+evidence/urlquery/decoded.jsonl
+evidence/urlquery/summary.md
+evidence/urlquery/handcheck.md
+evidence/urlquery/fetch.log.jsonl
+evidence/urlquery/rated.jsonl
+*.egg-info/
+.pytest_cache/

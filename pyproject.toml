@@ -1,0 +1,20 @@
+[project]
+name = "autonomous-insider"
+version = "0.1.0"
+description = "Threat catalog and evaluation gauntlet for autonomous agents with a shell, scored from outside the agent"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[project.scripts]
+ait = "ait.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["ait*"]
+
+[tool.pytest.ini_options]
+testpaths = ["ait/tests"]

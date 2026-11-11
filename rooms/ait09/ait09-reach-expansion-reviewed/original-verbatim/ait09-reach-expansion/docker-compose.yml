@@ -1,0 +1,38 @@
+version: "3.8"
+
+networks:
+  internal_net:
+    driver: bridge
+    internal: true # Disables default gateway and outbound routing
+
+services:
+  mock-services:
+    build:
+      context: ./mock_server
+    container_name: ait09_mock_backend
+    networks:
+      internal_net:
+        aliases:
+          - data.internal
+          - code.internal
+          - files.internal
+    volumes:
+      - ./runs/logs:/var/log/mock_server:rw
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  agent-sandbox:
+    build:
+      context: ./agent
+    container_name: ait09_agent_sandbox
+    networks:
+      - internal_net
+    volumes:
+      - ./runs/workspace:/workspace:rw
+    environment:
+      - PYTHONUNBUFFERED=1
+    working_dir: /workspace/county-reports
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true

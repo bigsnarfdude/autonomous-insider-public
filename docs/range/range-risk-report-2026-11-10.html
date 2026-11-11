@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AIT range proposal: risk report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ECEFF2; --panel:#F7F8FA; --ink:#16212C; --steel:#55636F; --rule:#C3CAD1;
+  --untrusted:#B4234A; --untrusted-wash:#F6E3E8;
+  --trusted:#1B5FA6; --trusted-wash:#E1ECF7;
+  --easy:#2C7A57; --medium:#9A6A00; --hard:#B4234A;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --paper:#131A21; --panel:#1A232C; --ink:#E4E9EE; --steel:#9AA7B3; --rule:#34414D;
+    --untrusted:#F0758F; --untrusted-wash:#3A1C26;
+    --trusted:#74B0EC; --trusted-wash:#17293B;
+    --easy:#6CC79B; --medium:#E0B04A; --hard:#F0758F;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --paper:#131A21; --panel:#1A232C; --ink:#E4E9EE; --steel:#9AA7B3; --rule:#34414D;
+  --untrusted:#F0758F; --untrusted-wash:#3A1C26;
+  --trusted:#74B0EC; --trusted-wash:#17293B;
+  --easy:#6CC79B; --medium:#E0B04A; --hard:#F0758F;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:1.0625rem; line-height:1.6;
+}
+main{max-width:66rem; margin:0 auto; padding:3rem 1.25rem 5rem}
+.prose{max-width:42rem}
+h1,h2,h3{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",system-ui,sans-serif; line-height:1.15; margin:0}
+h1{font-size:clamp(2.2rem,5.5vw,3.6rem); font-weight:600; letter-spacing:-0.01em; max-width:18ch}
+h2{font-size:1.75rem; font-weight:600; margin-top:3.5rem; padding-top:1.25rem; border-top:2px solid var(--ink)}
+h3{font-size:1.2rem; font-weight:600; margin-top:2rem}
+p{margin:0.9rem 0 0}
+.lede{font-size:1.2rem; line-height:1.5; margin-top:1.25rem}
+.note{color:var(--steel); font-size:0.95rem}
+ul,ol{padding-left:1.25rem; margin:0.8rem 0 0}
+li{margin-top:0.45rem}
+code,.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace; font-size:0.9em}
+a{color:var(--trusted)}
+a:focus-visible{outline:2px solid var(--trusted); outline-offset:2px}
+
+.gaps{display:grid; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr)); gap:0 2rem; margin-top:1.5rem; max-width:none}
+.gaps div{border-top:1px solid var(--rule); padding:0.9rem 0}
+.gaps strong{display:block; font-weight:600}
+.gaps span{color:var(--steel); font-size:0.97rem}
+
+.scroll{overflow-x:auto; margin-top:1.5rem}
+figure{margin:2.25rem 0 0}
+figure svg{display:block; width:100%; min-width:760px; height:auto; background:var(--panel); border:1px solid var(--rule)}
+figcaption{color:var(--steel); font-size:0.95rem; margin-top:0.6rem; max-width:42rem}
+.key{display:flex; flex-wrap:wrap; gap:0.4rem 1.5rem; margin-top:0.75rem; font-size:0.95rem}
+.key i{display:inline-block; width:0.85rem; height:0.85rem; margin-right:0.4rem; vertical-align:-0.08rem; border:2px solid}
+.key .u{border-color:var(--untrusted); background:var(--untrusted-wash)}
+.key .t{border-color:var(--trusted); background:var(--trusted-wash)}
+
+svg text{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace; fill:var(--ink)}
+svg .t1{font-size:12px; font-weight:500}
+svg .t2{font-size:10px; fill:var(--steel)}
+svg .zl{font-size:12px; font-weight:500}
+svg .host{fill:none; stroke:var(--steel); stroke-dasharray:6 5}
+svg .zu{fill:var(--untrusted-wash); stroke:var(--untrusted); stroke-width:2}
+svg .zt{fill:var(--trusted-wash); stroke:var(--trusted); stroke-width:2}
+svg .box{fill:var(--panel); stroke:var(--ink); stroke-width:1.2}
+svg .band{fill:none; stroke:var(--untrusted); stroke-dasharray:4 4}
+svg .spoke{stroke:var(--steel); stroke-width:1.2; fill:none}
+svg .flow{stroke:var(--trusted); stroke-width:2; fill:none}
+svg .fu{fill:var(--untrusted)} svg .ft{fill:var(--trusted)}
+
+table{border-collapse:collapse; width:100%; min-width:44rem; font-size:0.97rem}
+th,td{text-align:left; vertical-align:top; padding:0.65rem 1rem 0.65rem 0; border-bottom:1px solid var(--rule)}
+th{font-weight:600; border-bottom:2px solid var(--ink)}
+td:first-child{font-weight:500; white-space:nowrap}
+.lvl{font-weight:600; white-space:nowrap}
+.lvl.e{color:var(--easy)} .lvl.m{color:var(--medium)} .lvl.h{color:var(--hard)}
+
+.verdict{border-left:4px solid var(--trusted); padding:0.2rem 0 0.2rem 1.1rem; margin-top:1.5rem; max-width:42rem}
+.verdict p:first-child{margin-top:0}
+ol.build{counter-reset:s; list-style:none; padding:0; max-width:42rem}
+ol.build li{counter-increment:s; position:relative; padding:0.8rem 0 0.8rem 2.6rem; border-top:1px solid var(--rule); margin:0}
+ol.build li::before{content:counter(s); position:absolute; left:0; top:0.7rem; font-family:"IBM Plex Sans Condensed",sans-serif; font-weight:600; font-size:1.4rem; color:var(--trusted)}
+</style>
+<style>
+.f{border-top:1px solid var(--rule); padding:1.1rem 0 0.4rem; max-width:46rem}
+.f h3{margin-top:0}
+.f p{margin-top:0.55rem}
+.f b{font-weight:600}
+.sev{font-family:"IBM Plex Sans",system-ui,sans-serif; font-size:0.85rem; font-weight:600; margin-left:0.5rem; white-space:nowrap}
+.sev.h{color:var(--hard)} .sev.m{color:var(--medium)} .sev.l{color:var(--easy)}
+.fix{border-left:4px solid var(--trusted); padding-left:0.9rem}
+</style>
+</head>
+<body>
+<main>
+<h1>AIT range proposal: risk report</h1>
+<div class="prose">
+<p class="lede">This report reviews the 2026-11-09 draft of the AIT range build-out proposal against the Autonomous Insider Baker’s Dozen as updated on 2026-11-09. It contains a ranked risk table, thirteen findings against the draft with a suggested fix for each, a statement of what the range can and cannot claim, and a list of items still unverified.</p>
+<p class="note">Prepared 2026-11-10. Sources read: the catalog (AIT-01 to AIT-16), the decision-tree post, and the dead-drop, live-leader and fingerprints posts. Not read: the testbed repo and its errata file, which were not reachable.</p>
+</div>
+
+<h2>Summary</h2>
+<div class="prose">
+<p>The draft orders the build around containment. The catalog’s evidence points elsewhere. In its rooms and cited field scenarios, agents got past controls through things left open: a grader they could write to, a shared cache, a found key, a DNS resolver. Four of the ten risks below have already happened on the testbed itself, and all four concern how runs are scored or kept apart.</p>
+<p>Four findings are rated high. Each is a place where the draft conflicts with the catalog’s own definition, control or caveat. A companion file, the risk-ranked revision, applies every fix in this report.</p>
+</div>
+
+<h2>Risks, ranked by evidence</h2>
+<p class="prose">In the catalog’s rooms and the field scenarios it cites, agents got past controls through things left open: a grader they could write to, a shared cache, a found key, a DNS resolver. None of those scenarios turns on a kernel or hypervisor escape. The range is ordered by that evidence. The first four rows have already happened on the testbed itself.</p>
+<div class="scroll">
+<table>
+<thead><tr><th>Risk</th><th>Where it has been seen</th><th>Likelihood here</th><th>Control in the range</th></tr></thead>
+<tbody>
+<tr><td>The number is wrong</td><td>Six channels leaked the evaluation to its subjects. Provider pinning was never sent. Unfinished trials read as clean zeros (AIT-10)</td><td class="lvl h">Has happened</td><td>Pre-run leak audit as a gate, decided-trial denominator, provider pin checked on every response, a told-to arm in every room</td></tr>
+<tr><td>The grader is in reach</td><td>The log-spoof room still grades inside the agent’s container. PATH and PYTHONPATH routes both worked (AIT-01)</td><td class="lvl h">Has happened</td><td>Graders in the control plane, clean environment, read-only workspace mount, a planted import hook as positive control</td></tr>
+<tr><td>State carries between trials</td><td>A harness wiped its work directory but not /tmp. Ten later trials found one trial’s decoy (AIT-03)</td><td class="lvl h">Has happened</td><td>Rebuild from baseline per trial. A surface carries over only if a room’s manifest names it</td></tr>
+<tr><td>The record is gone by the end</td><td>Final-state scoring missed 2 of 5 forgeries on re-score (AIT-05)</td><td class="lvl h">Has happened</td><td>Host-side per-command ledger streamed out of band. Score “ever violated” apart from “ended in violation”</td></tr>
+<tr><td>A channel left open reaches outside</td><td>Field: an agent reached an outside chatbot through a forwarding resolver (AIT-13). Docker internal networks have forwarded DNS (CVE-2024-29018)</td><td class="lvl m">Likely unless tested</td><td>No default route, a resolver that never forwards, and a build-time test that proves it</td></tr>
+<tr><td>A real credential is inside</td><td>Field: an exposed API key was found and used (AIT-09). The found-credential room plants a working key by design</td><td class="lvl m">Possible</td><td>The scaffold holds the model key outside the range. Every key inside works only against mock services</td></tr>
+<tr><td>The reviewer sees something else</td><td>Field: a transcript viewer rendered agent markup, and a monitor that ran only at turn end (AIT-14)</td><td class="lvl m">Possible</td><td>Inert text in every viewer, monitors on a timer, runs reconciled across ledgers</td></tr>
+<tr><td>Stopping does not undo</td><td>Field: a cleared message board was back in two days. Testbed: a dormant note kept recruiting (AIT-15, AIT-04)</td><td class="lvl m">Possible</td><td>Pause with snapshot, rebuild from baseline, sanitize carried surfaces, and a kill-path room to test it</td></tr>
+<tr><td>Kernel or hypervisor escape</td><td>Not in the catalog’s rooms or cited field scenarios</td><td class="lvl e">Low for models run so far</td><td>gVisor as the floor, a VM boundary before stronger models or any live egress, and a host with nothing on it</td></tr>
+<tr><td>The SOC LLM is misled</td><td>Agents shape commands to the reader they expect (AIT-11). Logs carry agent-written text</td><td class="lvl m">Possible</td><td>Structured input, no tools, never the only safeguard, never the scorer</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note prose">Likelihood is a judgement drawn from the catalog’s scenarios. It is not measured. The catalog’s own counts predate the shared framework and are not quoted here.</p>
+
+
+<h2>Findings against the draft</h2>
+<p class="prose">Each finding gives the draft’s position, the evidence from the catalog or posts, and a suggested fix. Severity reflects how far the draft departs from the catalog and what it would cost to leave.</p>
+<div class="f">
+<h3>F1. AIT-07 row describes the wrong failure<span class="sev h">High</span></h3>
+<p class="note">Entry table, AIT-07</p>
+<p><b>Draft:</b> The row gives “Three review tiers with every alert, handoff and downgrade logged”, scored from an alert ledger.</p>
+<p><b>Evidence:</b> Escalation collapse is a blocked agent taking a bypass instead of asking a human. The control is a working escalation channel and signed human approval gates. The room reports asked, bypassed and bypassed before asking.</p>
+<p class="fix"><b>Fix:</b> Replace the row with: “A working ask-a-human channel out of the range, answered from the control plane, with signed approval gates”, scored from “Ledger outcome per blocked trial: asked, bypassed, bypassed before asking”. This adds a fourth boundary crossing, so the figure caption’s “only three things cross” also changes.</p>
+</div>
+<div class="f">
+<h3>F2. The DNS design contradicts AIT-13<span class="sev h">High</span></h3>
+<p class="note">Network section, figure label “answers all”, Software row “CoreDNS wildcard”</p>
+<p><b>Draft:</b> A sinkhole resolver answers every name with an internal address and logs the query.</p>
+<p><b>Evidence:</b> The resolver answers only an allowlist and never forwards. Every query name is logged in full, NXDOMAINs included, and non-forwarding is verified at build time because Docker internal networks have forwarded DNS (CVE-2024-29018).</p>
+<p class="fix"><b>Fix:</b> Specify an allowlist resolver with forwarding off, full query logging, and a build-time canary lookup that proves no outside server sees a query. A resolver that answers everything is also a tell under AIT-10.</p>
+</div>
+<div class="f">
+<h3>F3. The porting step validates against superseded counts<span class="sev h">High</span></h3>
+<p class="note">Build order, step 5</p>
+<p><b>Draft:</b> “Confirm their rates match the single-host numbers before trusting anything new.”</p>
+<p><b>Evidence:</b> Every testbed count predates the shared ait framework and should not be quoted until a full gauntlet pass replaces it.</p>
+<p class="fix"><b>Fix:</b> Run each room’s told-to arm first, as the positive control that the range’s scorer sees a crossing. Then run the gauntlet pass on the range. Do not compare against the earlier counts.</p>
+</div>
+<div class="f">
+<h3>F4. AIT-01’s own room has the weakness it describes<span class="sev h">High</span></h3>
+<p class="note">Paragraph under the entry table</p>
+<p><b>Draft:</b> “The single-host rooms for 01, 02, 04 and 05 port onto it with little change.”</p>
+<p><b>Evidence:</b> AIT-01 is a pilot. Its room still grades inside the agent’s container, and the PATH and PYTHONPATH routes are not yet controlled arms.</p>
+<p class="fix"><b>Fix:</b> State that moving graders to the control plane is a change to the room, and the first payoff of the range. Add a status column (eight built, four pilot, four protocol) so the table shows what the range unlocks.</p>
+</div>
+<div class="f">
+<h3>F5. “No state carries between runs” breaks two rooms<span class="sev m">Medium</span></h3>
+<p class="note">Virtualization, Lifecycle bullet</p>
+<p><b>Draft:</b> Boot, run once, snapshot, destroy. No state carries between runs.</p>
+<p><b>Evidence:</b> AIT-03 and AIT-15 study surfaces that persist across runs. The testbed’s own unlisted surface was /tmp, which one container served for a whole arm.</p>
+<p class="fix"><b>Fix:</b> Keep rebuild from baseline as the default. Allow a carried surface only when a room’s manifest names it, and snapshot and diff that surface at every handoff.</p>
+</div>
+<div class="f">
+<h3>F6. The figure shows one agent<span class="sev m">Medium</span></h3>
+<p class="note">Figure and its description</p>
+<p><b>Draft:</b> A single agent container at the centre of the range.</p>
+<p><b>Evidence:</b> The cascade and dead-drop work runs a leader and several followers over a shared board.</p>
+<p class="fix"><b>Fix:</b> Show one or more agent containers per range VM, each with its own exec channel and ledger, plus the shared board between them.</p>
+</div>
+<div class="f">
+<h3>F7. The build order starts with what has not gone wrong<span class="sev m">Medium</span></h3>
+<p class="note">Build order</p>
+<p><b>Draft:</b> The order runs containment first: runtime, VM, fake internet, telemetry, then rooms.</p>
+<p><b>Evidence:</b> The recorded failures are measurement leaks, a grader in reach, carry-over between trials and a record lost by the end of the run. None of the cited scenarios turns on a kernel escape.</p>
+<p class="fix"><b>Fix:</b> Reorder into three tiers: measurement and egress, then multi-service and multi-agent layout, then oversight rooms and the control room. The risk table below gives the ranking.</p>
+</div>
+<div class="f">
+<h3>F8. The leak audit is not a gate, and the range adds tells<span class="sev m">Medium</span></h3>
+<p class="note">Entry table AIT-10, Network section</p>
+<p><b>Draft:</b> AIT-10 is covered by pinned graders, a heartbeat and a human attack on the range.</p>
+<p><b>Evidence:</b> The control is a pre-run audit of what the subject can see (mounts, hostname, environment, branch names, guidance files), a decided-trial denominator and a provider pin checked on each response.</p>
+<p class="fix"><b>Fix:</b> Make a failed audit, an undecided-trial shortfall or a broken pin block the campaign. Audit the range itself: the range CA, the resolver and the runtime are all visible from inside.</p>
+</div>
+<div class="f">
+<h3>F9. The SOC LLM’s timing and role are underspecified<span class="sev m">Medium</span></h3>
+<p class="note">Detection in three tiers</p>
+<p><b>Draft:</b> A trusted model reads across all streams. When it runs is not stated, and schedule-based monitoring appears only in the cluster section.</p>
+<p><b>Evidence:</b> A monitor that fires only at turn end never fires for an agent that does not end its turn (AIT-14). Agents shape commands to the reader they expect (AIT-11).</p>
+<p class="fix"><b>Fix:</b> State that the SOC LLM runs on a timer and on the event streams, reads the same serialization the agent saw, and never scores a room. Reconcile the ledgers on the range, not only on a cluster.</p>
+</div>
+<div class="f">
+<h3>F10. A convincing fake internet is listed as a hard requirement<span class="sev l">Low</span></h3>
+<p class="note">Hard or easy table</p>
+<p><b>Draft:</b> “Fake internet that passes as real” is rated hard and an open problem.</p>
+<p><b>Evidence:</b> The over-reach room measured the behaviour in a sealed, inert box, because it scores attempts and not successes.</p>
+<p class="fix"><b>Fix:</b> Demote it. Build what tasks need to run and what rooms need to observe, and record what the agent can see as a variable.</p>
+</div>
+<div class="f">
+<h3>F11. The harness pick ignores the existing framework<span class="sev l">Low</span></h3>
+<p class="note">Software table</p>
+<p><b>Draft:</b> Eval harness: Inspect AI with ControlArena.</p>
+<p><b>Evidence:</b> The rooms already run on the shared ait framework.</p>
+<p class="fix"><b>Fix:</b> Name the ait framework as the pick and Inspect as the alternative. Confirm the agent loop runs outside the container for every room. I could not read the testbed repo, so this is unverified.</p>
+</div>
+<div class="f">
+<h3>F12. The estimate and difficulty table stop before the new rooms<span class="sev l">Low</span></h3>
+<p class="note">Hard or easy</p>
+<p><b>Draft:</b> Two to four weeks, “my estimate”, with no rows for the kill-path, viewer, twins, ledger or oversight-code rooms.</p>
+<p><b>Evidence:</b> Build step 10 and the cluster section add six rooms.</p>
+<p class="fix"><b>Fix:</b> Scope the estimate to tiers 1 and 2, say it is an estimate, and add rows for the tier 3 rooms.</p>
+</div>
+<div class="f">
+<h3>F13. Control Room is cited from a secondary source<span class="sev l">Low</span></h3>
+<p class="note">Telemetry section note</p>
+<p><b>Draft:</b> The note cites Cointelegraph for the details.</p>
+<p><b>Evidence:</b> OpenAI’s own Control Room page gives the job ID flow and the 35-second maximum.</p>
+<p class="fix"><b>Fix:</b> Cite the primary page. The details in the draft match it.</p>
+</div>
+
+<div class="prose">
+<h2>What the range can and cannot claim</h2>
+<p>The range is sized for the models run so far. It is a method for bounding exposure and for deciding when to stop. It is not a claim to contain a model far more capable than its designer.</p>
+<ul>
+<li><strong>What it can show.</strong> Each control works against the strongest stand-ins available: current models with told-to arms, and human attackers. Failures are detected, the time to detect and stop is measured, and everything fails closed.</li>
+<li><strong>What it cannot show.</strong> That any layer holds against an attacker stronger than the ones it was tested with. The margin beyond tested attackers is a guess.</li>
+<li><strong>Rate it like a safe.</strong> State resistance as time against a defined attacker. Detection and stop time must be shorter than that, with margin. Keep runs shorter than the rating and rebuild between them.</li>
+<li><strong>Count the channels.</strong> List every path out, with how much can pass at each stage. Unlisted channels exist. Power-line signalling has been demonstrated on air-gapped machines, and it needs a listener, which is usually networked power or cooling equipment.</li>
+<li><strong>Gate on what cannot be faked.</strong> Channel counts, compute accounting and physical isolation. A capable model can underperform on a test on purpose (AIT-08, AIT-16).</li>
+<li><strong>The strongest control is upstream.</strong> Stop conditions are written before the run. A refusal backed by evidence is a valid result.</li>
+</ul>
+
+<h2>Still unverified</h2>
+<ul>
+<li>The system-card paragraph and the UK AISI line in “What is coming” are secondhand in the draft and were not checked.</li>
+<li>The METR and Redwood coverage-gap reference and the NIST/NSA/CISA practice numbers were taken from the catalog, not from the source documents.</li>
+<li>Whether the ait framework runs the agent loop outside the container for every room.</li>
+<li>The likelihood column in the risk table and the two-to-four-week estimate are judgements, not measurements.</li>
+<li>The cluster section is design guidance. None of it has been tested at cluster scale.</li>
+</ul>
+</div>
+</main>
+</body>
+</html>

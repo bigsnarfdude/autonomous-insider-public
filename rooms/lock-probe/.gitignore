@@ -1,0 +1,21 @@
+__pycache__/
+*.pyc
+.DS_Store
+.claude/
+# results & scratch outputs — harness repo stays code-only; experiments publish separately
+out/
+verdicts_*/
+lock-probe-out/
+*.results.json
+# model weights / large blobs
+*.safetensors
+*.gguf
+bf16/
+models/
+weights/
+# internal multi-session coordination — not for publication
+SESSION-STATE.md
+
+# secrets — never commit
+openrouter.key
+*.key

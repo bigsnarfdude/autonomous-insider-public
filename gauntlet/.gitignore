@@ -1,0 +1,18 @@
+# secrets & PII — never commit
+*.key
+openrouter.key
+.env
+# run outputs (large, per-run, may hold payloads)
+out/
+**/out/
+live_runs*/
+*.console
+*.log
+# build/cache
+__pycache__/
+*.pyc
+.DS_Store
+# archives / images
+*.zip
+*.png
+*.jpg
