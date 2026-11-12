@@ -1,0 +1,9 @@
+{
+ "room": "ait05",
+ "depth": 5,
+ "random_per_config": 400,
+ "seed": 20261111,
+ "cases": 5976,
+ "disagreements": 0,
+ "examples": []
+}

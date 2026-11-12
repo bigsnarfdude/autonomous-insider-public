@@ -19,3 +19,23 @@ jobs:
       # The suite needs no network, Docker or model key.
       - run: python -m pytest -q ait/tests
       - run: python -m ait rooms
+  formal:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Lean
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Build the model and check the proofs
+        working-directory: formal
+        run: lake build
+      - name: No route outside the accepted list
+        working-directory: formal
+        run: ./.lake/build/bin/routes 5 | diff - expected/lock_probe_routes.json
+      - name: Replay against the room container
+        run: |
+          docker build -q -t contagion-sandbox rooms/ait11/sandbox
+          python3 formal/replay_lock_probe.py --n 200
+      - name: Closed room holds in the real container
+        run: python3 formal/validate_closed.py

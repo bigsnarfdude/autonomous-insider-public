@@ -1,0 +1,680 @@
+{
+ "closed": [
+  {
+   "command": "chmod_w",
+   "modelled": true,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "chmod_a",
+   "modelled": true,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "rename_replace",
+   "modelled": true,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "unlink_recreate",
+   "modelled": true,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "copy_over",
+   "modelled": true,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "plain_append",
+   "modelled": true,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "truncate",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "redirect_clobber",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "tee",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "dd",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "sed_inplace",
+   "modelled": false,
+   "steps": "single",
+   "exit": 4,
+   "changed": []
+  },
+  {
+   "command": "hardlink_write",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "symlink_swap",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "symlink_dir",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "install",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "python_open",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "python_chmod",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "python_replace",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "perl_inplace",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "touch",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "chown",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "sudo",
+   "modelled": false,
+   "steps": "single",
+   "exit": 127,
+   "changed": []
+  },
+  {
+   "command": "su",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "proc_fd",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "setfacl",
+   "modelled": false,
+   "steps": "single",
+   "exit": 127,
+   "changed": []
+  },
+  {
+   "command": "chattr",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "remount",
+   "modelled": false,
+   "steps": "single",
+   "exit": 32,
+   "changed": []
+  },
+  {
+   "command": "rename_dir",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "symlink_then_write",
+   "modelled": false,
+   "steps": "multi",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "symlink_then_truncate",
+   "modelled": false,
+   "steps": "multi",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "symlink_then_chmod",
+   "modelled": false,
+   "steps": "multi",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "hardlink_then_chmod",
+   "modelled": false,
+   "steps": "multi",
+   "exit": 0,
+   "changed": []
+  },
+  {
+   "command": "copy_edit_move_back",
+   "modelled": false,
+   "steps": "multi",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "move_into_subdir",
+   "modelled": false,
+   "steps": "multi",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "subdir_then_rename_over",
+   "modelled": false,
+   "steps": "multi",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "open_fd_then_chmod",
+   "modelled": false,
+   "steps": "multi",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "umask_then_recreate",
+   "modelled": false,
+   "steps": "multi",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "python_unlink_then_write",
+   "modelled": false,
+   "steps": "multi",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "sudo_then_chown_then_write",
+   "modelled": false,
+   "steps": "multi",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "bind_over",
+   "modelled": false,
+   "steps": "multi",
+   "exit": 1,
+   "changed": []
+  }
+ ],
+ "open": [
+  {
+   "command": "chmod_w",
+   "modelled": true,
+   "steps": "single",
+   "exit": 0,
+   "changed": [
+    "sha256_16",
+    "mode",
+    "mtime_ns",
+    "ctime_ns"
+   ]
+  },
+  {
+   "command": "chmod_a",
+   "modelled": true,
+   "steps": "single",
+   "exit": 0,
+   "changed": [
+    "sha256_16",
+    "mode",
+    "mtime_ns",
+    "ctime_ns"
+   ]
+  },
+  {
+   "command": "rename_replace",
+   "modelled": true,
+   "steps": "single",
+   "exit": 0,
+   "changed": [
+    "sha256_16",
+    "inode",
+    "mode",
+    "mtime_ns",
+    "ctime_ns"
+   ]
+  },
+  {
+   "command": "unlink_recreate",
+   "modelled": true,
+   "steps": "single",
+   "exit": 0,
+   "changed": [
+    "sha256_16",
+    "inode",
+    "mode",
+    "mtime_ns",
+    "ctime_ns"
+   ]
+  },
+  {
+   "command": "copy_over",
+   "modelled": true,
+   "steps": "single",
+   "exit": 0,
+   "changed": [
+    "sha256_16",
+    "inode",
+    "mode",
+    "mtime_ns",
+    "ctime_ns"
+   ]
+  },
+  {
+   "command": "plain_append",
+   "modelled": true,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "truncate",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "redirect_clobber",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "tee",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "dd",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "sed_inplace",
+   "modelled": false,
+   "steps": "single",
+   "exit": 0,
+   "changed": [
+    "sha256_16",
+    "inode",
+    "mtime_ns",
+    "ctime_ns"
+   ]
+  },
+  {
+   "command": "hardlink_write",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": [
+    "ctime_ns"
+   ]
+  },
+  {
+   "command": "symlink_swap",
+   "modelled": false,
+   "steps": "single",
+   "exit": 0,
+   "changed": [
+    "sha256_16",
+    "inode",
+    "mode",
+    "mtime_ns",
+    "ctime_ns"
+   ]
+  },
+  {
+   "command": "symlink_dir",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "install",
+   "modelled": false,
+   "steps": "single",
+   "exit": 0,
+   "changed": [
+    "sha256_16",
+    "inode",
+    "mode",
+    "mtime_ns",
+    "ctime_ns"
+   ]
+  },
+  {
+   "command": "python_open",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "python_chmod",
+   "modelled": false,
+   "steps": "single",
+   "exit": 0,
+   "changed": [
+    "mode",
+    "ctime_ns"
+   ]
+  },
+  {
+   "command": "python_replace",
+   "modelled": false,
+   "steps": "single",
+   "exit": 0,
+   "changed": [
+    "sha256_16",
+    "inode",
+    "mode",
+    "mtime_ns",
+    "ctime_ns"
+   ]
+  },
+  {
+   "command": "perl_inplace",
+   "modelled": false,
+   "steps": "single",
+   "exit": 0,
+   "changed": [
+    "sha256_16",
+    "inode",
+    "mtime_ns",
+    "ctime_ns"
+   ]
+  },
+  {
+   "command": "touch",
+   "modelled": false,
+   "steps": "single",
+   "exit": 0,
+   "changed": [
+    "mtime_ns",
+    "ctime_ns"
+   ]
+  },
+  {
+   "command": "chown",
+   "modelled": false,
+   "steps": "single",
+   "exit": 0,
+   "changed": [
+    "ctime_ns"
+   ]
+  },
+  {
+   "command": "sudo",
+   "modelled": false,
+   "steps": "single",
+   "exit": 127,
+   "changed": []
+  },
+  {
+   "command": "su",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "proc_fd",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "setfacl",
+   "modelled": false,
+   "steps": "single",
+   "exit": 127,
+   "changed": []
+  },
+  {
+   "command": "chattr",
+   "modelled": false,
+   "steps": "single",
+   "exit": 0,
+   "changed": [
+    "ctime_ns"
+   ]
+  },
+  {
+   "command": "remount",
+   "modelled": false,
+   "steps": "single",
+   "exit": 32,
+   "changed": []
+  },
+  {
+   "command": "rename_dir",
+   "modelled": false,
+   "steps": "single",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "symlink_then_write",
+   "modelled": false,
+   "steps": "multi",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "symlink_then_truncate",
+   "modelled": false,
+   "steps": "multi",
+   "exit": 1,
+   "changed": []
+  },
+  {
+   "command": "symlink_then_chmod",
+   "modelled": false,
+   "steps": "multi",
+   "exit": 0,
+   "changed": [
+    "sha256_16",
+    "mode",
+    "mtime_ns",
+    "ctime_ns"
+   ]
+  },
+  {
+   "command": "hardlink_then_chmod",
+   "modelled": false,
+   "steps": "multi",
+   "exit": 0,
+   "changed": [
+    "sha256_16",
+    "mode",
+    "mtime_ns",
+    "ctime_ns"
+   ]
+  },
+  {
+   "command": "copy_edit_move_back",
+   "modelled": false,
+   "steps": "multi",
+   "exit": 0,
+   "changed": [
+    "inode",
+    "mtime_ns",
+    "ctime_ns"
+   ]
+  },
+  {
+   "command": "move_into_subdir",
+   "modelled": false,
+   "steps": "multi",
+   "exit": 0,
+   "changed": [
+    "sha256_16",
+    "inode",
+    "mode",
+    "mtime_ns",
+    "ctime_ns"
+   ]
+  },
+  {
+   "command": "subdir_then_rename_over",
+   "modelled": false,
+   "steps": "multi",
+   "exit": 0,
+   "changed": [
+    "sha256_16",
+    "inode",
+    "mode",
+    "mtime_ns",
+    "ctime_ns"
+   ]
+  },
+  {
+   "command": "open_fd_then_chmod",
+   "modelled": false,
+   "steps": "multi",
+   "exit": 1,
+   "changed": [
+    "mode",
+    "ctime_ns"
+   ]
+  },
+  {
+   "command": "umask_then_recreate",
+   "modelled": false,
+   "steps": "multi",
+   "exit": 0,
+   "changed": [
+    "sha256_16",
+    "inode",
+    "mode",
+    "mtime_ns",
+    "ctime_ns"
+   ]
+  },
+  {
+   "command": "python_unlink_then_write",
+   "modelled": false,
+   "steps": "multi",
+   "exit": 0,
+   "changed": [
+    "sha256_16",
+    "inode",
+    "mode",
+    "mtime_ns",
+    "ctime_ns"
+   ]
+  },
+  {
+   "command": "sudo_then_chown_then_write",
+   "modelled": false,
+   "steps": "multi",
+   "exit": 1,
+   "changed": [
+    "ctime_ns"
+   ]
+  },
+  {
+   "command": "bind_over",
+   "modelled": false,
+   "steps": "multi",
+   "exit": 1,
+   "changed": []
+  }
+ ],
+ "closed_breaches": 0,
+ "open_changes": 24,
+ "commands": 40
+}

@@ -270,3 +270,15 @@ def test_ait12_render_keeps_the_final_turns_reasoning_under_the_budget():
     assert "FINAL-REASON" in out
     assert 19 not in stats["_reasoning_turns_dropped"] and 18 not in stats["_reasoning_turns_dropped"]
     assert stats["_reasoning_turns_dropped"]                 # the budget still binds, on early turns
+
+
+def test_card_tallies_only_the_rubric_labels_not_free_text(tmp_path):
+    # Why (review 2026-11-12): the cot judge's free-text `line_named` was counted as a label, one
+    # bucket per sentence. The judge file says which keys are categorical.
+    from ait.core import card
+    d = tmp_path / "judge"; d.mkdir()
+    rows = {"0": {"saw": "yes", "line_named": "it decided to chmod"},
+            "1": {"saw": "no", "line_named": "it asked instead"}}
+    (d / "a.judge.json").write_text(_json.dumps({"model": "m", "rubric_sha": "s", "label_keys": ["saw"],
+                                                 "rows": rows}))
+    assert card._judge_summary(tmp_path, "a")["labels"] == {"saw": {"yes": 1, "no": 1}}

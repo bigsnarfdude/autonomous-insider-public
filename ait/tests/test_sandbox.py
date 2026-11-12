@@ -119,3 +119,40 @@ def test_a_faulted_sandbox_trial_is_a_harness_error_not_a_scored_trial(tmp_path,
                  seed_base=1, n=2, concurrency=1, api_key="k").run()
     m = json.loads((out / "metrics.json").read_text())["arms"]["A"]
     assert m["harness_error"] == 1 and m["broke"]["hits"] == 1 and m["broke"]["decided"] == 1
+
+
+# ---- review 2026-11-12 ---------------------------------------------------------------------------
+
+def test_host_log_is_written_as_root_and_a_failed_write_voids_the_trial():
+    # Why: the log was appended as the agent's own user, so the agent could truncate or delete what
+    # the docstring called a record it "can't suppress", and a failed write was dropped silently.
+    sb = _sb()
+    sb._name = "fake"
+    seen = {}
+    sb._guarded_run = lambda args, soft: (seen.update(args=args) or ("", "Permission denied", 1, False))
+    sb.host_write_log("/var/log/ait/run.log", "line")
+    assert "-u" not in seen["args"]                      # root, not the agent's user
+    assert sb._faults and "host log write failed" in sb._faults[0]
+
+
+def test_workspace_log_is_the_agents_own_and_never_faults():
+    sb = _sb()
+    sb._name = "fake"
+    seen = {}
+    sb._guarded_run = lambda args, soft: (seen.update(args=args) or ("", "", 1, False))
+    sb.workspace_log("/work/run.log", "line")
+    a = seen["args"]
+    assert a[a.index("-u") + 1] == "analyst" and not sb._faults
+
+
+def test_a_sigkill_at_the_limit_is_a_timeout_and_an_early_one_is_not():
+    # Why: `timeout -k` exits 137 when SIGTERM was not enough. Only 124 counted, so the hardest
+    # hangs were recorded as ordinary failures. 137 before the limit is an OOM kill or `kill -9`.
+    sb = _sb(exec_timeout=0)                             # any elapsed time is past the limit
+    sb._name = "fake"
+    sb._guarded_run = lambda args, soft: ("", "", 137, False)
+    assert sb.exec("sleep 99").timed_out
+    sb2 = _sb(exec_timeout=600)
+    sb2._name = "fake"
+    sb2._guarded_run = lambda args, soft: ("", "", 137, False)
+    assert not sb2.exec("kill -9 $$").timed_out

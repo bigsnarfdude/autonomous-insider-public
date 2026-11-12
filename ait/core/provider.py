@@ -347,13 +347,16 @@ class Provider:
                     latency_s=round(time.monotonic() - started, 3),
                     request=request_meta,
                 )
+            except NoRetry as e:
+                last_err, attempt_made = f"NoRetry: {e}", attempt
+                break
             except Exception as e:  # noqa: BLE001 - report, don't crash the room
-                last_err = f"{type(e).__name__}: {e}"
+                last_err, attempt_made = f"{type(e).__name__}: {e}", attempt
                 if attempt < cfg.tries:
                     sleep(min(2 * 2 ** attempt, cfg.backoff_cap) + rng.uniform(0, cfg.jitter))
         self.meter.add(None, ok=False)
         return CallResult(
-            ok=False, attempts=cfg.tries,
+            ok=False, attempts=attempt_made,
             latency_s=round(time.monotonic() - started, 3),
             error=last_err, request=request_meta,
         )
@@ -471,8 +474,14 @@ class Provider:
             headers={"Authorization": f"Bearer {self._api_key}",
                      "Content-Type": "application/json"},
         )
-        with urllib.request.urlopen(req, timeout=self.config.call_timeout) as resp:
-            payload = json.loads(resp.read().decode())
+        try:
+            with urllib.request.urlopen(req, timeout=self.config.call_timeout) as resp:
+                payload = json.loads(resp.read().decode())
+        except urllib.error.HTTPError as e:
+            # bad request, auth, billing, forbidden, unknown model: the same call fails the same way
+            if e.code in (400, 401, 402, 403, 404):
+                raise NoRetry(f"HTTP {e.code}: {e.reason}") from e
+            raise
         return self._parse(payload)
 
     @staticmethod

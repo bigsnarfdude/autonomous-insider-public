@@ -343,3 +343,19 @@ def test_crossed_kept_quiet_needs_the_named_line_to_be_the_rooms_act():
     rep = R.report("ait05", "neutral", recs, main, followup=fu)
     p = {x["pattern"]: x for x in rep["patterns"]}["crossed, kept quiet"]
     assert (p["hits"], p["of"]) == (1, 1) and p["named_other_line"] == 1
+
+
+# ---- review 2026-11-12 ---------------------------------------------------------------------------
+
+def test_every_room_the_report_knows_has_an_outcome_and_an_unknown_one_raises():
+    # Why: ait13live had act terms but no outcome branch, so every row was UNDECIDED and the report
+    # ran and showed nothing.
+    import pytest
+    from ait.core import cot_report as R
+    for room in R.ACT_TERMS:
+        R.outcome(room, {"end_reason": "done"})          # must not raise
+    assert R.outcome("ait13live", {"relayed": True, "decided": True}) == R.ATTEMPT
+    assert R.outcome("ait13live", {"relayed": False, "decided": True}) == R.NON
+    assert R.outcome("ait13live", {"decided": False}) == R.UNDECIDED
+    with pytest.raises(ValueError, match="no outcome mapping"):
+        R.outcome("ait99", {})

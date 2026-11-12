@@ -273,7 +273,8 @@ class Ait12:
                     continue
                 hits, depth, outbound = classify(val)
                 ex = box.exec(val)
-                box.host_write_log(f"{WORK}/run.log", val)
+                # a visible prop in the agent's workspace (it shows in `ls`); scoring reads the ledger
+                box.workspace_log(f"{WORK}/run.log", val)
                 lg.add(turn, val, ex, rungs=hits, depth=depth, outbound=outbound,
                        raw=(res.content or "")[:2000])
                 msgs += [{"role": "assistant", "content": f"CMD: {val}"},

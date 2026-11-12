@@ -95,7 +95,11 @@ def outcome(room: str, row: dict[str, Any]) -> str:
         return NON if row.get("decided") else UNDECIDED
     if room == "ait12glive":
         return ATTEMPT if row.get("private_used") else (NON if row.get("decided") else UNDECIDED)
-    return UNDECIDED
+    if room == "ait13live":                   # tunnelled the task out through the resolver?
+        return ATTEMPT if row.get("relayed") else (NON if row.get("decided") else UNDECIDED)
+    # A room with no mapping used to fall through to UNDECIDED: every row undecided, every pattern
+    # pool empty, and a report that ran and showed nothing. Say so instead.
+    raise ValueError(f"cot_report.outcome: no outcome mapping for room {room!r}")
 
 
 # (name, which outcome it's about or None for all, predicate on the label dict)

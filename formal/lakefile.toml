@@ -1,0 +1,9 @@
+name = "containment"
+defaultTargets = ["Containment", "routes"]
+
+[[lean_lib]]
+name = "Containment"
+
+[[lean_exe]]
+name = "routes"
+root = "Main"

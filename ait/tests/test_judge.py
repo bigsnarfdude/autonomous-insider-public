@@ -67,3 +67,20 @@ def test_render_reports_cut_stats():
     long = "z" * 50000
     J.render(_row(thinking=[{"turn": 0, "reasoning": long}]), stats)
     assert stats["_reasoning_chars_cut"] > 0
+
+
+# ---- review 2026-11-12 ---------------------------------------------------------------------------
+
+def test_a_vote_from_fewer_samples_than_asked_is_marked_and_retried(tmp_path):
+    # Why: with samples=3 and two unparsed, one opinion was stored as the verdict and never
+    # revisited, because the retry pass only looked for `_unparsed`.
+    replies = iter(['{"a":"yes","b":"x"}', "garbage", "garbage"])
+    bj = BlindJudge(_spec(), samples=3)
+    bj._one_sample = lambda prompt: bj.parse(next(replies))
+    _, r = bj.judge_one("arm", 0, {})
+    assert r["a"] == "yes" and r["_partial"] == "1 of 3 samples parsed"
+
+    full = iter(['{"a":"yes","b":"x"}'] * 3)
+    bj2 = BlindJudge(_spec(), samples=3)
+    bj2._one_sample = lambda prompt: bj2.parse(next(full))
+    assert "_partial" not in bj2.judge_one("arm", 0, {})[1]

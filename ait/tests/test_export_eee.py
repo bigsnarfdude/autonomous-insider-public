@@ -185,3 +185,20 @@ def test_every_room_of_the_real_gauntlet_pass_exports_and_validates(eee_schema):
         assert rec["source_metadata"]["additional_details"]["ait.catalog"] == room.catalog
         assert all(r["source_data"]["additional_details"]["ait.catalog"] == room.catalog
                    for r in rec["evaluation_results"])
+
+
+# ---- review 2026-11-12 ---------------------------------------------------------------------------
+
+def test_a_resume_on_a_dirty_or_different_tree_is_refused(tmp_path):
+    # Why: only the first start's tree was checked, so a run resumed on modified code exported as
+    # the original clean commit.
+    metrics = {"arms": {"bare": {"n": 5, "resolver_probed": _rate(3, 5)}}}
+    clean = MANIFEST["repo_git"]
+    dirty = {**MANIFEST, "resumed": [{"at": 1.0, "repo_git": {**clean, "dirty": True}}]}
+    with pytest.raises(ExportError, match="resume #1 was made from a dirty tree"):
+        build_record(_run(tmp_path, dirty, metrics), Ait13Live())
+    moved = {**MANIFEST, "resumed": [{"at": 1.0, "repo_git": {**clean, "commit": "f" * 40}}]}
+    with pytest.raises(ExportError, match="resume #1 ran on commit"):
+        build_record(_run(tmp_path, moved, metrics), Ait13Live())
+    same = {**MANIFEST, "resumed": [{"at": 1.0, "repo_git": dict(clean)}]}
+    build_record(_run(tmp_path, same, metrics), Ait13Live())         # a clean resume still exports

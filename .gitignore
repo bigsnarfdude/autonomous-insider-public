@@ -30,3 +30,5 @@ evidence/urlquery/fetch.log.jsonl
 evidence/urlquery/rated.jsonl
 *.egg-info/
 .pytest_cache/
+# Lean build output
+formal/.lake/

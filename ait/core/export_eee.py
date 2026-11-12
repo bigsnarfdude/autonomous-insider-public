@@ -98,6 +98,15 @@ def build_record(run_dir: Path, room: Any, *, org: str = "bigsnarfdude",
     git = man.get("repo_git") or {}
     if git.get("dirty"):
         raise ExportError(f"{run_dir}: run was made from a dirty tree; the commit isn't the code that ran")
+    # A resume records the tree it ran on. Part of the run made on modified or different code is
+    # not the commit this record would name.
+    for i, res in enumerate(man.get("resumed") or []):
+        rg = res.get("repo_git") or {}
+        if rg.get("dirty"):
+            raise ExportError(f"{run_dir}: resume #{i + 1} was made from a dirty tree")
+        if rg.get("commit") and git.get("commit") and rg["commit"] != git["commit"]:
+            raise ExportError(f"{run_dir}: resume #{i + 1} ran on commit {rg['commit'][:8]}, "
+                              f"the run started on {git['commit'][:8]}")
     if metrics.get("invalid"):
         raise ExportError(f"{run_dir}: the room marked this run INVALID")
     specs: dict[str, MetricSpec] = getattr(room, "metric_specs", None) or {}

@@ -58,9 +58,15 @@ def _judge_summary(run_dir: Path, arm: str) -> dict[str, Any] | None:
     rows = list(d.get("rows", {}).values())
     ok = [r for r in rows if "_unparsed" not in r]
     labels: dict[str, dict[str, int]] = {}
+    # Tally only the rubric's categorical labels, as _cross_agreement does. A free-text field
+    # (the cot judge's `line_named`) is not a category: counted, it made one bucket per sentence.
+    # Judge files written before `label_keys` existed fall back to the old skip-list.
+    keys = d.get("label_keys")
     for r in ok:
         for k, v in r.items():
-            if k.startswith("_") or k == "evidence_quote" or not isinstance(v, str):
+            if k.startswith("_") or not isinstance(v, str):
+                continue
+            if (k not in keys) if keys is not None else (k in ("evidence_quote", "line_named")):
                 continue
             labels.setdefault(k, {}).setdefault(v, 0)
             labels[k][v] += 1
@@ -260,7 +266,7 @@ td.arm{{font-family:"SF Mono",Consolas,monospace;white-space:nowrap}} pre{{white
 code{{font-size:.8rem;word-break:break-all}} h3{{font-size:.92rem;margin:.9rem 0 .3rem}} .cap{{margin:.4rem 0 .7rem}}
 </style></head><body>
 <h1>AIT gauntlet — {html.escape(card['subject'])}</h1>
-<p class=q>{html.escape(card['created_utc'])}{html.escape(total)} · rates are hits/decided; undecided trials (failed calls, crashes, truncations) are shown, never counted as clean. Check ERRATA.md before quoting a number.</p>
+<p class=q>{html.escape(card['created_utc'])}{html.escape(total)} · rates are hits/decided; undecided trials (failed calls, crashes, step limits) are shown, never counted as clean; each room's own void rule says which truncated replies it keeps. Check ERRATA.md before quoting a number.</p>
 <p class=q>{html.escape(card.get('independence', INDEPENDENCE))}</p>
 {''.join(blocks)}
 </body></html>"""

@@ -47,3 +47,32 @@ def test_no_limit_lets_calls_overlap_past_the_cap(monkeypatch):
     provider.set_inflight_limit(None)
     _hammer(8)
     assert live["peak"] > 2
+
+
+# ---- review 2026-11-12 ---------------------------------------------------------------------------
+
+def test_auth_and_billing_errors_are_not_retried(monkeypatch):
+    # Why: a 401 or 402 took all the tries with backoff, minutes per call, for an error the same
+    # request will hit again. The Anthropic path already stopped; this one did not.
+    from ait.core.provider import NoRetry
+    calls = {"n": 0}
+
+    def post(self, body):
+        calls["n"] += 1
+        raise NoRetry("HTTP 401: Unauthorized")
+    monkeypatch.setattr(Provider, "_post", post)
+    p = Provider(ProviderConfig(model="m", tries=8), api_key="k", meter=Meter())
+    r = p.chat([{"role": "user", "content": "x"}], seed=1, sleep=lambda s: None)
+    assert not r.ok and calls["n"] == 1 and r.attempts == 1 and "401" in r.error
+
+
+def test_a_server_error_is_still_retried(monkeypatch):
+    calls = {"n": 0}
+
+    def post(self, body):
+        calls["n"] += 1
+        raise RuntimeError("HTTP 503")
+    monkeypatch.setattr(Provider, "_post", post)
+    p = Provider(ProviderConfig(model="m", tries=3), api_key="k", meter=Meter())
+    r = p.chat([{"role": "user", "content": "x"}], seed=1, sleep=lambda s: None)
+    assert not r.ok and calls["n"] == 3 and r.attempts == 3

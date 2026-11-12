@@ -109,3 +109,43 @@ def test_a_verb_glued_to_the_previous_word_still_ends_the_command():
     # an upper-case run is a word, not a verb; inside quotes it is text
     assert action_of12("CMD: echo XCMD: y") == ("cmd", "echo XCMD: y")
     assert action_of12('CMD: grep "logCMD: " run.log') == ("cmd", 'grep "logCMD: " run.log')
+
+
+# ---- review 2026-11-12: the parser decides what the agent "did", so a misread is a wrong score ----
+
+def test_a_command_that_mentions_answer_is_a_command():
+    # Why: ANSWER matched anywhere, so this parsed as an answer of 5 and the grep never ran.
+    from ait.core.actions import parse
+    assert parse('CMD: grep "ANSWER: 5" notes.txt', ("CMD", "ANSWER", "GIVEUP")) == \
+        ("cmd", 'grep "ANSWER: 5" notes.txt')
+
+
+def test_prose_giveup_does_not_end_the_trial():
+    from ait.core.actions import parse
+    verbs = ("CMD", "ANSWER", "GIVEUP")
+    assert parse("I won't giveup: not yet.\nCMD: ls", verbs) == ("cmd", "ls")
+    assert parse("GIVEUP: the data is not here", verbs)[0] == "giveup"
+    assert parse("**GIVEUP: no route**", verbs)[0] == "giveup"
+
+
+def test_answer_keeps_its_sign_and_reads_thousands_separators():
+    # Why: "-5" was scored as 5 and "1,234.50" as 1, against ground truth.
+    from ait.core.actions import parse
+    verbs = ("CMD", "ANSWER")
+    assert parse("ANSWER: -5", verbs) == ("answer", "-5")
+    assert parse("ANSWER: 1,234.50", verbs) == ("answer", "1234.50")
+    assert parse("ANSWER: $4.73", verbs) == ("answer", "4.73")
+    assert parse("ANSWER: -$12", verbs) == ("answer", "-12")
+
+
+def test_backticks_that_belong_to_the_command_survive():
+    # Why: the closing tick of a command substitution was stripped, the shell got an unterminated
+    # command, and the room recorded a failure the agent did not cause.
+    from ait.core.actions import parse
+    assert parse("CMD: echo `date`") == ("cmd", "echo `date`")
+    assert parse("CMD: `ls -l`") == ("cmd", "ls -l")              # a wrapper pair still goes
+    assert parse("CMD: `echo `date``") == ("cmd", "echo `date`")
+    assert parse("CMD: ls -l`") == ("cmd", "ls -l")               # half a wrapper still goes
+    # found by re-parsing saved replies: a wrapper closing right before another one opens
+    assert parse("`CMD: ls -la /work`</think>`CMD: id`") == ("cmd", "ls -la /work")
+    assert parse("`CMD: echo `date``") == ("cmd", "echo `date`")

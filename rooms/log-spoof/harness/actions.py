@@ -56,7 +56,7 @@ def clean_command(cmd: str, verbs: tuple[str, ...] = ("CMD",)) -> str:
             cmd = cmd[:m.start()]
             break
     for _ in range(3):                                # tags / ticks / bold can nest at the edges
-        cmd = _HTML_EDGES.sub("", cmd).strip().strip("`").strip()
+        cmd = _unwrap_ticks(_HTML_EDGES.sub("", cmd).strip())
         # markdown bold only: a leading `**`, and a trailing `**` right after a word/quote — never a
         # glob (`ls *`, `rm /tmp/*`, `dir/**` keep theirs)
         cmd = re.sub(r"^\*\*\s*", "", cmd)
@@ -81,10 +81,36 @@ def command_text(rest: str) -> str:
             out.append(lines[i]); i += 1
             if lines[i - 1].strip() == delim:
                 break
-        return "\n".join(out).strip().strip("`").strip()
+        return _unwrap_ticks("\n".join(out).strip())
     while i < len(lines) and (out[-1].rstrip().endswith("\\") or not _quotes_closed("\n".join(out))):
         out.append(lines[i]); i += 1
-    return "\n".join(out).strip().strip("`").strip()
+    return _unwrap_ticks("\n".join(out).strip())
+
+
+def _unwrap_ticks(s: str) -> str:
+    """Remove markdown backticks WRAPPED AROUND a command, never ones that belong to it.
+
+    A matched pair around the whole text goes (`` `ls -la` ``). So does a lone tick at one edge
+    when the count is odd, which is a wrapper whose other half was cut off. A command that ends in
+    its own closing tick (``echo `date` ``) has an even count and no tick at the front, so it is
+    left alone: stripping it sent the shell an unterminated command and the room recorded a failure
+    the agent never caused."""
+    s = s.strip()
+    while len(s) >= 2 and s[0] == "`" and s[-1] == "`":
+        s = s[1:-1].strip()
+    # an empty pair at an edge is markdown debris (a wrapper closing next to another opening),
+    # never part of a command: an empty substitution does nothing
+    # (only when the ticks balance: with an odd count one of the two is the command's own)
+    while s.endswith("``") and s.count("`") % 2 == 0:
+        s = s[:-2].strip()
+    while s.startswith("``") and s.count("`") % 2 == 0:
+        s = s[2:].strip()
+    if s.count("`") % 2 == 1:
+        if s.startswith("`"):
+            s = s[1:].strip()
+        elif s.endswith("`"):
+            s = s[:-1].strip()
+    return s
 
 
 def _quotes_closed(s: str) -> bool:
@@ -93,6 +119,10 @@ def _quotes_closed(s: str) -> bool:
         return True
     except ValueError:
         return False
+
+
+# what may sit before a verb at the start of its line: quote marks, bold, backticks, tags
+_LINE_START = r"^[\s>*`]*(?:<[^>]+>)*\s*"
 
 
 def _verb(name: str) -> re.Pattern[str]:
@@ -118,10 +148,14 @@ def parse(content: str | None, verbs: tuple[str, ...] = ("CMD", "DONE"), *,
                 return got
         return ("none", None)
     if "ANSWER" in verbs:
-        m = re.search(r"ANSWER:\s*\$?([0-9]+(?:\.[0-9]+)?)", c, re.I)
+        # Line-anchored like ASK and DONE: `CMD: grep "ANSWER: 5" notes.txt` is a command, and a
+        # prose "giveup: not yet" is not the end of the trial. Sign and thousands separators are
+        # part of the number: "-5" is not 5 and "1,234.50" is not 1.
+        m = re.search(_LINE_START + r"ANSWER:(?:\*\*|`)*\s*(-?)\s*\$?\s*(-?)([0-9][0-9,]*(?:\.[0-9]+)?)",
+                      c, re.M | re.I)
         if m:
-            return ("answer", m.group(1))
-    if "GIVEUP" in verbs and re.search(r"GIVEUP:", c, re.I):
+            return ("answer", (m.group(1) or m.group(2)) + m.group(3).replace(",", ""))
+    if "GIVEUP" in verbs and re.search(_LINE_START + r"GIVEUP:", c, re.M | re.I):
         return ("giveup", None)
     if "ASK" in verbs:
         m = re.search(r"^[\s>*`]*(?:<[^>]+>)*\s*ASK:(?:\*\*|`)*\s*(.+)", c, re.M | re.I)

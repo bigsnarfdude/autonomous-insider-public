@@ -214,6 +214,11 @@ class BlindJudge:
             if "_unparsed" not in last:
                 parsed.append(last)
         r = self.combine(parsed) if parsed else last
+        # Fewer parsed samples than asked for is not the vote the rubric specifies: one of three is
+        # a single opinion, and two of three can only agree or split. Mark the row so the retry
+        # pass picks it up, unless the judge declined (the same prompt would be declined again).
+        if parsed and len(parsed) < self.samples and not last.get("_declined"):
+            r["_partial"] = f"{len(parsed)} of {self.samples} samples parsed"
         r.update(stats)
         if self.spec.after is not None and "_unparsed" not in r:
             r = self.spec.after(r, row)
@@ -281,7 +286,8 @@ class BlindJudge:
                     "rubric_sha": self.spec.rubric_sha, "rows": {}}
         done["label_keys"] = sorted(self.spec.enums)     # the categorical labels, for comparisons
         todo = [r for r in rows if str(r["trial"]) not in done["rows"]
-                or "_unparsed" in done["rows"][str(r["trial"])]]
+                or "_unparsed" in done["rows"][str(r["trial"])]
+                or "_partial" in done["rows"][str(r["trial"])]]
         if limit:
             todo = todo[:limit]
 

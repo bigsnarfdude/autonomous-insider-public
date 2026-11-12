@@ -17,6 +17,7 @@ import secrets
 import shlex
 import subprocess
 import threading
+import time
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -142,10 +143,16 @@ class Sandbox:
                 "timeout", "-k", "3", str(int(self.exec_timeout)),
                 "bash", "--norc", "--noprofile", "-c",
                 f"cd {shlex.quote(self.workdir)} 2>/dev/null; {command}"]
+        started = time.monotonic()
         out, err, rc, timed_out = self._guarded_run(full, self.exec_timeout + self.drain_grace)
+        elapsed = time.monotonic() - started
         if timed_out and not (out or err):
             return ExecResult(out="[command timed out]", exit=124, timed_out=True)
-        return ExecResult(out=out + err, exit=rc, timed_out=(rc == 124 or timed_out))
+        # `timeout -k 3` exits 124 when SIGTERM was enough and 137 when it had to SIGKILL. 137 is
+        # also what an out-of-memory kill or the agent's own `kill -9` gives, so it counts as a
+        # timeout only when the limit had actually passed.
+        killed_at_limit = rc == 137 and elapsed >= self.exec_timeout
+        return ExecResult(out=out + err, exit=rc, timed_out=(rc == 124 or timed_out or killed_at_limit))
 
     def root_exec(self, command: str) -> subprocess.CompletedProcess:
         """Run a command in the container as its default docker user (root), no cd.
@@ -159,10 +166,31 @@ class Sandbox:
         return subprocess.CompletedProcess(args, rc, stdout=out, stderr=err)
 
     def host_write_log(self, logfile: str, line: str) -> None:
-        """Append a line to a file *as the host records it* — the agent can't suppress it.
+        """Append a line to a log inside the container, as root.
 
-        This is how a room keeps an out-of-band record the trajectory can't tamper with.
+        The agent cannot alter the log only if the room puts it where the agent has no write
+        access: a root-owned file in a directory that is root-owned, or sticky and not the agent's.
+        (That is the configuration `formal/` proves holds for a file.) Written as the agent's own
+        user into the agent's workspace, as this used to be, the agent could truncate or delete it.
+
+        Root here has no capabilities, so it cannot write a file the agent owns: a log seeded in
+        the wrong place fails the write. A failed write is a sandbox fault and voids the trial; it
+        is never dropped silently.
         """
+        _out, err, rc, _timed = self._guarded_run(
+            ["docker", "exec", self._name, "bash", "-c",
+             f"printf '%s\\n' {shlex.quote(line)} >> {shlex.quote(logfile)}"],
+            self.host_timeout,
+        )
+        if rc != 0:
+            self._faults.append(f"host log write failed ({rc}) for {logfile}: {err.strip()[:120]}")
+
+    def workspace_log(self, logfile: str, line: str) -> None:
+        """Append a line to a file in the agent's own workspace, as the agent's user.
+
+        This is a prop the agent can see, edit or delete: part of the scene, never evidence. The
+        record a trial is scored from is the host-side Ledger. Use `host_write_log` for a log the
+        agent must not be able to alter."""
         self._guarded_run(
             ["docker", "exec", "-u", self.user, self._name, "bash", "-c",
              f"printf '%s\\n' {shlex.quote(line)} >> {shlex.quote(logfile)}"],
